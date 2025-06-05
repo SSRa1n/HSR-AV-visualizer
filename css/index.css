@@ -1,0 +1,16 @@
+body {
+    background-color: darkcyan !important;
+}
+nav {
+    background-color: rgba(0,0,0,0.1);
+}
+.char-btn {
+    background-color: rgba(0,0,0,0.1);
+    border: 1px rgba(240,248,255,0) solid;
+    width: 75px;
+    transition: 0.5s;
+}
+.char-btn:hover {
+    background-color: rgba(0,0,0,0.25);
+    border: 1px rgba(255, 255, 255, 0.75) solid;
+}
