@@ -1,16 +1,82 @@
+* {
+    font-family: 'D-DIN';
+    color: aliceblue;
+}
 body {
-    background-color: darkcyan !important;
+    background-repeat: no-repeat;
 }
-nav {
-    background-color: rgba(0,0,0,0.1);
+
+.navbar {
+    background-color: rgba(0, 162, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
 }
+
 .char-btn {
-    background-color: rgba(0,0,0,0.1);
-    border: 1px rgba(240,248,255,0) solid;
+    background-color: rgba(0, 0, 0, 0.1);
+    border: 1px rgba(240, 248, 255, 0) solid;
+    border-radius: 10%;
     width: 75px;
     transition: 0.5s;
+    color: aliceblue;
 }
+
 .char-btn:hover {
-    background-color: rgba(0,0,0,0.25);
+    background-color: rgba(0, 0, 0, 0.25);
     border: 1px rgba(255, 255, 255, 0.75) solid;
+}
+
+.charselectmodal {
+    background-color: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    z-index: 1;
+    width: 60vw;
+    min-height: 25vh;
+    overflow-y: auto;
+    /* enables scrolling inside */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    border: 2px aliceblue solid;
+    border-radius: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.gamemode-select {
+    width: 15%;
+
+    option {
+        color: black;
+    }
+}
+
+.charselectmodal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.closecharselectbtn {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    background-color: rgba(255, 0, 0, 0.5);
+    height: 30px;
+    width: 30px;
+    font-size: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    border-radius: 5px;
+}
+
+.closecharselectbtn:hover {
+    background-color: rgba(255, 0, 0, 0.6);
+}
+
+.closecharselectbtn:active {
+    background-color: rgba(255, 0, 0, 1);
 }
