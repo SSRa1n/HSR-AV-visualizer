@@ -21,9 +21,13 @@ body {
     background-color: rgba(0, 0, 0, 0.1);
     border: 1px rgba(240, 248, 255, 0) solid;
     border-radius: 10%;
-    width: 75px;
+    width: 90px;
     transition: 0.5s;
     color: aliceblue;
+    div {
+        overflow: hidden;  
+        text-overflow: ellipsis;
+    }
 }
 
 .char-btn:hover {
@@ -35,7 +39,7 @@ body {
     background-color: rgba(0, 0, 0, 0.1);
     border: 1px rgba(240, 248, 255, 0) solid;
     border-radius: 10%;
-    width: 50px;
+    width: 60px;
     font-size: 0.8rem;
     color: aliceblue;
 }
@@ -94,41 +98,3 @@ body {
 .closecharselectbtn:active {
     background-color: rgba(255, 0, 0, 1);
 }
-
-/* Ruler */
-.ruler-container {
-    position: relative;
-    height: 600px;
-    display: flex;
-    width: calc(450px + 19 * 300px);
-    background-color: rgba(0,0,0,0.5);
-    border: 1px solid #ccc;
-    margin-top: 2rem;
-}
-.slot {
-    height: 100%;
-    border-right: 1px solid #999;
-    display: flex;
-    align-items: start;
-    justify-content: end;
-    font-size: 16px;
-    white-space: nowrap;
-  background-image: 
-    linear-gradient(to right, rgba(128,128,128,0.3) 1px, transparent 1px);
-  background-size: 30px 100%;
-  background-repeat: repeat-x;
-}
-.slot:first-child {
-    width: 450px;
-}
-.slot:not(:first-child) {
-    width: 300px;
-}
-
-.overlay-element {
-      position: absolute;
-      top: 0;
-      left: 0; /* example: slot 3 (450 + 300*1) */
-}
-
-/* Ruler */
