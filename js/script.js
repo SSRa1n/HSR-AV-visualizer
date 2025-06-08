@@ -1,3 +1,34 @@
+//////////////////////////////// Modify ////////////////////////////////
+const roster_size = 4;
+let team_roster = Array(roster_size).fill("None");
+
+characters = ['None', 'Castorice', 'Firefly', 'Fugue', 'Lingsha', 'March 7th - Preservation', 'Ruan Mei', 'Seele', 'Stelle - Remembrance', 'The Herta'];
+memosprites = { 'Castorice': 'Pollux', 'Lingsha': 'Fuyuan', 'Stelle - Remembrance': 'Mem' };
+
+const ruler_height = 600;
+let pixel_per_av = 3;
+
+const actionbar_height = 40;
+////////////////////////////////////////////////////////////////
+
+//////////////////////////////// Constant ////////////////////////////////
+const gamemode_data = {
+    1: {'Name':'Memory of Chaos','Cycle':20,'AV':2050},
+    2: {'Name':'Pure Fiction','Cycle':4,'AV':600},
+    3: {'Name':'Apocalyptic Shadow','Cycle':1,'AV':2000}
+};
+const backgrounds = {
+    1: 'url("img/bg-moc.png")',
+    2: 'url("img/bg-pf.png")',
+    3: 'url("img/bg-as.png")'
+};
+////////////////////////////////////////////////////////////////
+
+//////////////////////////////// Initialize ////////////////////////////////
+update_roster();
+generate_ruler(document.getElementById("gamemode-select").value);
+////////////////////////////////////////////////////////////////
+
 const charselectbtn = document.getElementById("charselectbtn");
 const closecharselectbtn = document.getElementById("closecharselectbtn");
 const charselectmodal = document.getElementById("charselectmodal");
@@ -14,15 +45,13 @@ closecharselectbtn.addEventListener("click", () => { charselectmodal.classList.r
 
 function select_character(char) {
     charselectmodal.classList.remove("active");
-    selected_char[roster_position] = char;
+    team_roster[roster_position] = char;
     update_roster();
 }
 
 //////// UNCOMMENT for Modal coding ////////
 // charselectmodal.classList.add("active");
 
-characters = ['None', 'Castorice', 'Firefly', 'Fugue', 'Lingsha', 'March 7th - Preservation', 'Ruan Mei', 'Seele', 'Stelle - Remembrance', 'The Herta'];
-memosprites = { 'Castorice': 'Pollux', 'Lingsha': 'Fuyuan', 'Stelle - Remembrance': 'Mem' };
 charmodallist = document.getElementById('charmodallist');
 charlist = '';
 for (const c of characters) {
@@ -35,11 +64,6 @@ for (const c of characters) {
 }
 charmodallist.innerHTML = charlist;
 
-const roster_size = 4;
-let selected_char = ['None', 'None', 'None', 'None'];
-
-update_roster();
-
 // Roster button
 function update_roster() {
     let rosterhtml = ""
@@ -47,30 +71,30 @@ function update_roster() {
         curr_html = `
           <div class="d-flex mb-1 align-items-center justify-content-end">
             <button type="button" class="char-btn mr-auto me-2" onclick="opencharselect(${i})">
-              <img src="img/char/${selected_char[i]}.webp" alt="" width="100%" onerror="this.onerror=null;this.src='img/char/None.webp';">
-              <div>${selected_char[i]}</div>
+              <img src="img/char/${team_roster[i]}.webp" alt="" width="100%" onerror="this.onerror=null;this.src='img/char/None.webp';">
+              <div>${team_roster[i]}</div>
             </button>
             <form class="form-inline my-2 my-lg-0">
-              <input class="form-control mr-sm-2" type="number" min="0" placeholder="Speed" aria-label="Speed">
+              <input class="form-control mr-sm-2" type="number" min="0" placeholder="Speed" aria-label="Speed" id="char-${i}-spd" value="${139-(i)}">
             </form>
           </div>
         `;
-        if (selected_char[i] in memosprites) {
+        if (team_roster[i] in memosprites) {
             curr_html += `
             <div class="d-flex align-items-center justify-content-end">
                 <button type="button" class="memo-btn mr-auto me-2">
-                <img src="img/char/${memosprites[selected_char[i]]}.webp" alt="" width="100%" onerror="this.onerror=null;this.src='img/char/None.webp';">
-                <div>${memosprites[selected_char[i]]}</div>
+                <img src="img/char/${memosprites[team_roster[i]]}.webp" alt="" width="100%" onerror="this.onerror=null;this.src='img/char/None.webp';">
+                <div>${memosprites[team_roster[i]]}</div>
                 </button>
                 <form class="form-inline my-2 my-lg-0">
-                <input class="form-control form-control-sm mr-sm-2" type="number" min="0" placeholder="Speed" aria-label="Speed">
+                <input class="form-control form-control-sm mr-sm-2" type="number" min="0" placeholder="Speed" aria-label="Speed" id="char-${i}-memo-spd">
                 </form>
             </div>
             `;
         }
         rosterhtml += `<div>${curr_html}</div>`;
     }
-    if(selected_char.some(c => c in memosprites)) {
+    if(team_roster.some(c => c in memosprites)) {
         document.body.style.paddingTop = '250px';
     }
     else {
@@ -80,14 +104,6 @@ function update_roster() {
 }
 
 // Select Gamemode
-const backgrounds = {
-    1: 'url("img/bg-moc.png")',
-    2: 'url("img/bg-pf.png")',
-    3: 'url("img/bg-as.png")'
-};
-const gamemode_data = {1: {'Name':'Memory of Chaos','Cycle':20}, 2: {'Name':'Pure Fiction','Cycle':4}, 3: {'Name':'Apocalyptic Shadow','Cycle':0}};
-const ruler_height = 600;
-let pixel_per_av = 3;
 function generate_ruler(gamemode) {
     curr_html = `<h3>Combat Actions (${gamemode_data[gamemode]['Name']})</h3>
                     <div class="ruler-container">`;
@@ -95,7 +111,7 @@ function generate_ruler(gamemode) {
         for(let i=1; i<= gamemode_data[gamemode]['Cycle']; i++) {
             curr_html += `<div class="slot pe-1">Cycle ${i}</div>`
         }
-        curr_html += `<div class="overlay-element pt-5">
+        curr_html += `<div class="ruler-overlay pt-5" id="ruler-overlay">
                 <!-- Overlay element here -->
              </div>
              </div>
@@ -130,7 +146,7 @@ function generate_ruler(gamemode) {
                     width: ${100*pixel_per_av}px;
                 }
 
-                .overlay-element {
+                .ruler-overlay {
                     position: absolute;
                     top: 0;
                     left: 0; /* example: slot 3 (${150*pixel_per_av} + ${100*pixel_per_av}*1) */
@@ -146,12 +162,26 @@ function generate_ruler(gamemode) {
     }
     document.getElementById('combatactionbar').innerHTML = curr_html;
 }
+
 const gamemodeselect = document.getElementById("gamemode-select");
 gamemodeselect.addEventListener('change', () => {
     const gamemode = gamemodeselect.value;
     document.body.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), ${backgrounds[gamemode]}`;
-    console.log(gamemode);
     generate_ruler(gamemode);
 }
 );
-generate_ruler(gamemodeselect.value);
+
+// Action bar
+ruler_overlay = document.getElementById('ruler-overlay');
+const char_spd = document.getElementById('char-1-spd').value;
+const char_av = 10000/char_spd;
+const rectangle_width = char_av * pixel_per_av
+// Floor division >>> 7/2 | 0
+total_rectangle = (gamemode_data[document.getElementById("gamemode-select").value]['AV']*pixel_per_av) / rectangle_width | 0
+rectangles = Array(total_rectangle).fill(rectangle_width);
+curr_html = '';
+for(let i=0;i<rectangles.length;i++) {
+    curr_html += `<div class="char-actionbar" id="char-actionbar" class="d-flex" style="width:${rectangles[i]}px;}"></div>`
+}
+curr_html += `<style>.char-actionbar {height: ${actionbar_height}px;background-color: rgba(255,0,0,1);border:1px aliceblue solid;}</style>`;
+ruler_overlay.innerHTML = `<div class="d-flex">${curr_html}</div>`;
