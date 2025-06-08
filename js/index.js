@@ -2,7 +2,7 @@ const charselectbtn = document.getElementById("charselectbtn");
 const closecharselectbtn = document.getElementById("closecharselectbtn");
 const charselectmodal = document.getElementById("charselectmodal");
 
-document.body.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url('../img/bg-moc.png')`;
+document.body.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url('img/bg-moc.png')`;
 
 let roster_position = 0;
 
@@ -28,7 +28,7 @@ charlist = '';
 for (const c of characters) {
     charlist += `
     <button type="button" class="char-btn charselect d-flex flex-column" onclick="select_character('${c}')">
-        <img src="../img/char/${c}.webp" alt="" width="100%" onerror="this.onerror=null;this.src='../img/char/None.webp';">
+        <img src="img/char/${c}.webp" alt="" width="100%" onerror="this.onerror=null;this.src='img/char/None.webp';">
         <div>${c}</div>
     </button>
     `;
@@ -47,7 +47,7 @@ function update_roster() {
         curr_html = `
           <div class="d-flex mb-1 align-items-center justify-content-end">
             <button type="button" class="char-btn mr-auto me-2" onclick="opencharselect(${i})">
-              <img src="../img/char/${selected_char[i]}.webp" alt="" width="100%" onerror="this.onerror=null;this.src='../img/char/None.webp';">
+              <img src="img/char/${selected_char[i]}.webp" alt="" width="100%" onerror="this.onerror=null;this.src='img/char/None.webp';">
               <div>${selected_char[i]}</div>
             </button>
             <form class="form-inline my-2 my-lg-0">
@@ -59,7 +59,7 @@ function update_roster() {
             curr_html += `
             <div class="d-flex align-items-center justify-content-end">
                 <button type="button" class="memo-btn mr-auto me-2">
-                <img src="../img/char/${memosprites[selected_char[i]]}.webp" alt="" width="100%" onerror="this.onerror=null;this.src='../img/char/None.webp';">
+                <img src="img/char/${memosprites[selected_char[i]]}.webp" alt="" width="100%" onerror="this.onerror=null;this.src='img/char/None.webp';">
                 <div>${memosprites[selected_char[i]]}</div>
                 </button>
                 <form class="form-inline my-2 my-lg-0">
@@ -81,9 +81,9 @@ function update_roster() {
 
 // Select Gamemode
 const backgrounds = {
-    1: 'url("../img/bg-moc.png")',
-    2: 'url("../img/bg-pf.png")',
-    3: 'url("../img/bg-as.png")'
+    1: 'url("img/bg-moc.png")',
+    2: 'url("img/bg-pf.png")',
+    3: 'url("img/bg-as.png")'
 };
 const gamemode_data = {1: {'Name':'Memory of Chaos','Cycle':20}, 2: {'Name':'Pure Fiction','Cycle':4}, 3: {'Name':'Apocalyptic Shadow','Cycle':0}};
 const ruler_height = 600;
