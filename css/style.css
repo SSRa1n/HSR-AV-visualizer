@@ -98,3 +98,8 @@ body {
 .closecharselectbtn:active {
     background-color: rgba(255, 0, 0, 1);
 }
+
+.char-actionbar {
+    background-color: rgba(204, 0, 255, 0.5);
+    border:1px aliceblue solid;
+}

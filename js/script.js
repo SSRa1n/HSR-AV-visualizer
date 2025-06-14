@@ -1,12 +1,15 @@
 //////////////////////////////// Modify ////////////////////////////////
 const roster_size = 4;
 let team_roster = Array(roster_size).fill("None");
+let team_actionbar = Array(roster_size).fill([]);
+let team_memo_actionbar = Array(roster_size).fill([]);
+// team_roster[0] = 'Castorice';
 
 characters = ['None', 'Castorice', 'Firefly', 'Fugue', 'Lingsha', 'March 7th - Preservation', 'Ruan Mei', 'Seele', 'Stelle - Remembrance', 'The Herta'];
 memosprites = { 'Castorice': 'Pollux', 'Lingsha': 'Fuyuan', 'Stelle - Remembrance': 'Mem' };
 
 const ruler_height = 600;
-let pixel_per_av = 3;
+let pixel_per_av = 3; // Default = 3
 
 const actionbar_height = 40;
 ////////////////////////////////////////////////////////////////
@@ -14,7 +17,7 @@ const actionbar_height = 40;
 //////////////////////////////// Constant ////////////////////////////////
 const gamemode_data = {
     1: {'Name':'Memory of Chaos','Cycle':20,'AV':2050},
-    2: {'Name':'Pure Fiction','Cycle':4,'AV':600},
+    2: {'Name':'Pure Fiction','Cycle':4,'AV':450},
     3: {'Name':'Apocalyptic Shadow','Cycle':1,'AV':2000}
 };
 const backgrounds = {
@@ -22,11 +25,15 @@ const backgrounds = {
     2: 'url("img/bg-pf.png")',
     3: 'url("img/bg-as.png")'
 };
+const actionbar_colors = ['rgba(0, 162, 255, 0.5)','rgba(0, 255, 34, 0.5)','rgba(255, 0, 0, 0.5)','rgba(204, 0, 255, 0.5)'];
 ////////////////////////////////////////////////////////////////
 
 //////////////////////////////// Initialize ////////////////////////////////
+test_spd = [90,161,160,104]
 update_roster();
 generate_ruler(document.getElementById("gamemode-select").value);
+init_actionbar_array();
+render_rectangle();
 ////////////////////////////////////////////////////////////////
 
 const charselectbtn = document.getElementById("charselectbtn");
@@ -47,6 +54,8 @@ function select_character(char) {
     charselectmodal.classList.remove("active");
     team_roster[roster_position] = char;
     update_roster();
+    init_actionbar_array();
+    render_rectangle();
 }
 
 //////// UNCOMMENT for Modal coding ////////
@@ -68,15 +77,16 @@ charmodallist.innerHTML = charlist;
 function update_roster() {
     let rosterhtml = ""
     for (let i = 0; i < roster_size; i++) {
-        curr_html = `
+        let char_spd = document.getElementById(`char-${i}-spd`)?.value;
+        let curr_html = `
           <div class="d-flex mb-1 align-items-center justify-content-end">
             <button type="button" class="char-btn mr-auto me-2" onclick="opencharselect(${i})">
               <img src="img/char/${team_roster[i]}.webp" alt="" width="100%" onerror="this.onerror=null;this.src='img/char/None.webp';">
               <div>${team_roster[i]}</div>
             </button>
-            <form class="form-inline my-2 my-lg-0">
-              <input class="form-control mr-sm-2" type="number" min="0" placeholder="Speed" aria-label="Speed" id="char-${i}-spd" value="${139-(i)}">
-            </form>
+            <div class="form-inline my-2 my-lg-0">
+              <input class="form-control mr-sm-2" type="number" min="0" placeholder="Speed" aria-label="Speed" id="char-${i}-spd" onchange="init_actionbar_array(); render_rectangle();" ${char_spd != null ? `value="${char_spd}"` : ""}>
+            </div>
           </div>
         `;
         if (team_roster[i] in memosprites) {
@@ -86,9 +96,9 @@ function update_roster() {
                 <img src="img/char/${memosprites[team_roster[i]]}.webp" alt="" width="100%" onerror="this.onerror=null;this.src='img/char/None.webp';">
                 <div>${memosprites[team_roster[i]]}</div>
                 </button>
-                <form class="form-inline my-2 my-lg-0">
-                <input class="form-control form-control-sm mr-sm-2" type="number" min="0" placeholder="Speed" aria-label="Speed" id="char-${i}-memo-spd">
-                </form>
+                <div class="form-inline my-2 my-lg-0">
+                <input class="form-control form-control-sm mr-sm-2" type="number" min="0" placeholder="Speed" aria-label="Speed" id="char-${i}-memo-spd" onchange="init_actionbar_array(); render_rectangle();">
+                </div>
             </div>
             `;
         }
@@ -105,7 +115,7 @@ function update_roster() {
 
 // Select Gamemode
 function generate_ruler(gamemode) {
-    curr_html = `<h3>Combat Actions (${gamemode_data[gamemode]['Name']})</h3>
+    let curr_html = `<h3>Combat Actions (${gamemode_data[gamemode]['Name']})</h3>
                     <div class="ruler-container">`;
     if(gamemode == 1 || gamemode == 2) {
         for(let i=1; i<= gamemode_data[gamemode]['Cycle']; i++) {
@@ -163,25 +173,64 @@ function generate_ruler(gamemode) {
     document.getElementById('combatactionbar').innerHTML = curr_html;
 }
 
-const gamemodeselect = document.getElementById("gamemode-select");
-gamemodeselect.addEventListener('change', () => {
-    const gamemode = gamemodeselect.value;
+document.getElementById("gamemode-select").addEventListener('change', () => {
+    let gamemode = document.getElementById("gamemode-select").value;
     document.body.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), ${backgrounds[gamemode]}`;
     generate_ruler(gamemode);
+    init_actionbar_array();
+    render_rectangle();
 }
 );
 
 // Action bar
-ruler_overlay = document.getElementById('ruler-overlay');
-const char_spd = document.getElementById('char-1-spd').value;
-const char_av = 10000/char_spd;
-const rectangle_width = char_av * pixel_per_av
-// Floor division >>> 7/2 | 0
-total_rectangle = (gamemode_data[document.getElementById("gamemode-select").value]['AV']*pixel_per_av) / rectangle_width | 0
-rectangles = Array(total_rectangle).fill(rectangle_width);
-curr_html = '';
-for(let i=0;i<rectangles.length;i++) {
-    curr_html += `<div class="char-actionbar" id="char-actionbar" class="d-flex" style="width:${rectangles[i]}px;}"></div>`
+function init_actionbar_array() {
+    for(let i=0; i<roster_size; i++) {
+        let char_spd = 134+(5*i);
+        // Comment for test
+        char_spd = document.getElementById(`char-${i}-spd`).value;
+        let char_av =  10000/char_spd;
+        let rectangle_width = char_av * pixel_per_av
+        // Floor division >>> 7/2 | 0 = 3 <--- I have no idea how did it do that
+        console.log(gamemode_data[document.getElementById("gamemode-select").value]['AV'])
+        let total_rectangle = (gamemode_data[document.getElementById("gamemode-select").value]['AV']*pixel_per_av) / rectangle_width | 0
+        team_actionbar[i] = Array(total_rectangle).fill(rectangle_width);
+        if (team_roster[i] in memosprites) {
+            let memo_spd = 90+(5*i);
+            // Comment for test
+            memo_spd = document.getElementById(`char-${i}-memo-spd`).value;
+            let memo_av =  10000/memo_spd;
+            let rectangle_width = memo_av * pixel_per_av
+            let total_rectangle = (gamemode_data[document.getElementById("gamemode-select").value]['AV']*pixel_per_av) / rectangle_width | 0
+            team_memo_actionbar[i] = Array(total_rectangle).fill(rectangle_width);
+        }
+    }
 }
-curr_html += `<style>.char-actionbar {height: ${actionbar_height}px;background-color: rgba(255,0,0,1);border:1px aliceblue solid;}</style>`;
-ruler_overlay.innerHTML = `<div class="d-flex">${curr_html}</div>`;
+
+function render_rectangle() {
+    let ruler_overlay = document.getElementById('ruler-overlay');
+    let overlay_curr_html = ''
+    for(let i=0; i<roster_size; i++) {
+        if(team_roster[i] === "None") continue;
+        let curr_html = '';
+        curr_html += `<div class="d-flex" id="char-${i}-actionbar">${get_rectangle(team_actionbar[i],'char',i)}</div>`;
+        if(team_roster[i] in memosprites) {
+            curr_html += `<div class="d-flex" id="char-${i}-memo-actionbar">${get_rectangle(team_memo_actionbar[i],'memo',i)}</div>`;
+        }
+        curr_html = `<div>${curr_html}</div>`;
+        overlay_curr_html += `<div class="mb-5">${curr_html}</div>`;
+    }
+    ruler_overlay.innerHTML = overlay_curr_html;
+}
+
+function get_rectangle(array, type, color) {
+    let rectangle_height = {'char':actionbar_height, 'memo':actionbar_height/2}
+    let curr_html = '';
+    for(let i=0;i<array.length;i++) {
+        curr_html += `<div class="char-actionbar" id="${type}-actionbar-${i}" class="d-flex" style="width:${array[i]}px; height: ${rectangle_height[type]}px; background-color: ${actionbar_colors[color]};"></div>`;
+    }
+    return curr_html;
+}
+
+function turn_advance(char_index, av, advance) {
+
+}
