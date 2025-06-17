@@ -3,7 +3,6 @@ const roster_size = 4;
 let team_roster = Array(roster_size).fill("None");
 let team_actionbar = Array(roster_size).fill([]);
 let team_memo_actionbar = Array(roster_size).fill([]);
-// team_roster[0] = 'Castorice';
 
 characters = ['None', 'Castorice', 'Firefly', 'Fugue', 'Lingsha', 'March 7th - Preservation', 'Ruan Mei', 'Seele', 'Stelle - Remembrance', 'The Herta'];
 memosprites = { 'Castorice': 'Pollux', 'Lingsha': 'Fuyuan', 'Stelle - Remembrance': 'Mem' };
@@ -26,10 +25,22 @@ const backgrounds = {
     3: 'url("img/bg-as.png")'
 };
 const actionbar_colors = ['rgba(0, 162, 255, 0.5)','rgba(0, 255, 34, 0.5)','rgba(255, 0, 0, 0.5)','rgba(204, 0, 255, 0.5)'];
+
+const advance_type = {
+    advance_char: (char_index, av, advance) => { turn_advance(char_index, 'char', av, advance); },
+    advance_memo: (char_index, av, advance) => { turn_advance(char_index, 'memo', av, advance); },
+    advance_both: (char_index, av, advance) => { turn_advance(char_index, 'char', av, advance);
+                                                 turn_advance(char_index, 'memo', av, advance); },
+    advance_all:  (av, advance)             => {for(let i=0;i<roster_size;i++) { 
+                                                    turn_advance(char_index, 'char', av, advance);
+                                                    turn_advance(char_index, 'memo', av, advance); }}
+}
 ////////////////////////////////////////////////////////////////
 
 //////////////////////////////// Initialize ////////////////////////////////
 test_spd = [90,161,160,104]
+let char_modified_spd = Array(roster_size).fill([]);
+let memo_modified_spd = Array(roster_size).fill([]);
 update_roster();
 generate_ruler(document.getElementById("gamemode-select").value);
 init_actionbar_array();
@@ -188,6 +199,7 @@ function init_actionbar_array() {
         let char_spd = 134+(5*i);
         // Comment for test
         char_spd = document.getElementById(`char-${i}-spd`).value;
+        char_modified_spd[i] = char_spd;
         let char_av =  10000/char_spd;
         let rectangle_width = char_av * pixel_per_av
         // Floor division >>> 7/2 | 0 = 3 <--- I have no idea how did it do that
@@ -198,6 +210,7 @@ function init_actionbar_array() {
             let memo_spd = 90+(5*i);
             // Comment for test
             memo_spd = document.getElementById(`char-${i}-memo-spd`).value;
+            memo_modified_spd[i] = memo_spd;
             let memo_av =  10000/memo_spd;
             let rectangle_width = memo_av * pixel_per_av
             let total_rectangle = (gamemode_data[document.getElementById("gamemode-select").value]['AV']*pixel_per_av) / rectangle_width | 0
@@ -231,6 +244,42 @@ function get_rectangle(array, type, color) {
     return curr_html;
 }
 
-function turn_advance(char_index, av, advance) {
+function adjust_av(char_index, type, arr) {
+    function sum_arr(arr) { return arr.reduce((sum, val) => sum + val, 0); }
+    let gamemode = document.getElementById("gamemode-select").value;
+    let modded_spd = (type == 'char')? char_modified_spd[char_index] : memo_modified_spd[char_index];
+    let modded_av = (10000 / modded_spd) * pixel_per_av;
+    if(sum_arr(arr) < (gamemode_data[gamemode]['AV'] * pixel_per_av)) {
+        while((sum_arr(arr) + modded_av) <= (gamemode_data[gamemode]['AV'] * pixel_per_av)) {
+            arr.push(modded_av);
+        }
+    }
+    else if(sum_arr(arr) > (gamemode_data[gamemode]['AV'] * pixel_per_av)) {
+        while(sum_arr(arr) > (gamemode_data[gamemode]['AV'] * pixel_per_av)) {
+            arr.pop();
+        }
+    }
+    return arr;
+}
 
+function find_index_by_sum(arr, target) {
+  let sum = 0;
+  for (let i = 0; i < arr.length; i++) {
+    if (sum + arr[i] >= target) {
+      return { index: i, prev: sum };
+    }
+    sum += arr[i];
+  }
+  return { index: arr.length, prev: sum };
+}
+
+function turn_advance(char_index, type, av, advance) {
+    let advanced_char = (type == 'char')? team_actionbar[char_index] : team_memo_actionbar[char_index];
+    av = av * pixel_per_av;
+    advance = 1 - advance;
+    let av_data = find_index_by_sum(advanced_char, av);
+    let new_av_width = (((advanced_char[av_data.index] * advance) + av_data.prev) <= av)? (av - av_data.prev) : (advanced_char[av_data.index] * advance)
+    advanced_char[av_data.index] = new_av_width;
+    advanced_char = adjust_av(char_index, type, advanced_char);
+    render_rectangle();
 }
